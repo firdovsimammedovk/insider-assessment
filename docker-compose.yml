@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: messaging_app
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - WEBHOOK_URL=https://webhook.site/c3f13233-1ed4-429e-9649-8133b3b9c9cd
+      - WEBHOOK_AUTH_KEY=INS.me1x9uMcyYGlhKKQVPoc.bO3j9aZwRTOcA2Ywo
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
